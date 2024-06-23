@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -20,7 +21,7 @@ import com.springsample.springboot.model.Employee;
 import com.springsample.springboot.service.EmployeeService;
 
 @Controller
-@RequestMapping("/api/employees")
+@RequestMapping("employees")
 public class EmployeeController {
 
 	private EmployeeService employeeService;
@@ -31,8 +32,9 @@ public class EmployeeController {
 	}
 	 
 	@PostMapping
-	public ResponseEntity<Employee> saveEmployee(@RequestBody Employee employee){
-		return new ResponseEntity<Employee>(employeeService.saveEmployee(employee), HttpStatus.CREATED);
+	public String saveEmployee(@ModelAttribute ("employee") Employee employee){
+		employeeService.saveEmployee(employee);
+		return "redirect:/employees";
 	}
 	
 	@GetMapping
@@ -58,4 +60,10 @@ public class EmployeeController {
 		return new ResponseEntity<String>("Employee deleted successfully...!", HttpStatus.OK);
 	}
 	
+	@GetMapping("/new")
+	public String createStudentForm(Model model) {
+		Employee employee = new Employee();
+		model.addAttribute("employee", employee);
+		return "create_employee";
+	}
 }
