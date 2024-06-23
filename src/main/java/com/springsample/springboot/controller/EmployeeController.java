@@ -3,7 +3,11 @@ package com.springsample.springboot.controller;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.springsample.springboot.model.Employee;
 import com.springsample.springboot.service.EmployeeService;
 
-@RestController
+@Controller
 @RequestMapping("/api/employees")
 public class EmployeeController {
 
@@ -32,8 +36,9 @@ public class EmployeeController {
 	}
 	
 	@GetMapping
-	public List<Employee> getAllEmployees(){
-		return employeeService.getAllEmployee();
+	public String getAllEmployees(Model model){
+		model.addAttribute("employees", employeeService.getAllEmployee());
+		return "employees";
 	}
 	
 	@GetMapping("{id}")
@@ -46,4 +51,11 @@ public class EmployeeController {
 													@RequestBody Employee employee){
 		return new ResponseEntity<Employee>(employeeService.updateEmployee(employee, id), HttpStatus.OK);
 	}
+	
+	@DeleteMapping("{id}")
+	public ResponseEntity<String> deleteEmployee(@PathVariable("id") long id){
+		employeeService.deleteEmployee(id);
+		return new ResponseEntity<String>("Employee deleted successfully...!", HttpStatus.OK);
+	}
+	
 }
