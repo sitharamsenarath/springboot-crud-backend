@@ -44,20 +44,33 @@ public class EmployeeController {
 	}
 	
 	@GetMapping("{id}")
-	public ResponseEntity<Employee> getEmployeeById(@PathVariable("id") long id) {
+	public ResponseEntity<Employee> getEmployeeById(@PathVariable("id") Long id) {
 		return new ResponseEntity<Employee>(employeeService.getEmployeeById(id), HttpStatus.OK);
 	}
 	
-	@PutMapping("{id}")
-	public ResponseEntity<Employee> updateEmployee(@PathVariable("id") long id,
-													@RequestBody Employee employee){
-		return new ResponseEntity<Employee>(employeeService.updateEmployee(employee, id), HttpStatus.OK);
+	@GetMapping("/edit/{id}")
+	public String editEmployeeForm(@PathVariable("id") Long id, Model model) {
+		model.addAttribute("employee", employeeService.getEmployeeById(id));
+		return "edit_employee";
 	}
 	
-	@DeleteMapping("{id}")
-	public ResponseEntity<String> deleteEmployee(@PathVariable("id") long id){
+	@PostMapping("{id}")
+	public String updateEmployee(@PathVariable("id") Long id, @ModelAttribute("employee") Employee employee, Model model){
+		Employee existingEmployee = employeeService.getEmployeeById(id);
+//		Employee existingEmployee = new Employee();
+//		existingEmployee.setId(id);
+		existingEmployee.setFirstName(employee.getFirstName());
+		existingEmployee.setLastName(employee.getLastName());
+		existingEmployee.setEmail(employee.getEmail());
+		
+		employeeService.saveEmployee(existingEmployee);
+		return "redirect:/employees";
+	}
+	
+	@GetMapping("delete/{id}")
+	public String deleteEmployee(@PathVariable("id") Long id){
 		employeeService.deleteEmployee(id);
-		return new ResponseEntity<String>("Employee deleted successfully...!", HttpStatus.OK);
+		return "redirect:/employees";
 	}
 	
 	@GetMapping("/new")
